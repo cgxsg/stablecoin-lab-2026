@@ -9,13 +9,14 @@ Answer directly under each question. 150–300 words each — **reasoning over l
 **A1.** The vault holds `MINTER_ROLE`, so it can `burn` any user's balance. Explain why that is a risk, then write out how you would change `Vault` and `SimpleStablecoin` to remove it.
 
 > Your answer:
-`MINTER_ROLE` has both minting and the ability to burn any address's balance, if the Vault is compromised or its key leaks, attacker could destroy sUSD without user approval, which break the trust that balances cannot be confiscated unilaterally. The fix is to separate minting from burning others' balances and restricting who can be burned. A normal `burn` should only burn the caller's own balance and the Vault's redemption should use a dedicated burn path that only burns sUSD already transferred to the Vault or require the user to approve first. So that legitimate redemptions still work, while the backdoor to confiscate any user's balance is removed.
+Minting and burning are both controlled by `MINTER_ROLE`, and the Vault holds that role. This gives the protocol the power to burn any user's balance without their approval. If the Vault is compromised, its private key leaks, or the role is mistakenly assigned to an untrusted address, an attacker could destroy arbitrary sUSD instantly. That breaks the fundamental trust that a user's balance cannot be confiscated unilaterally by the protocol.
+To fix it, I would separate the minting privilege from the privilege to burn other users' balances, and more importantly restrict which balances can be burned. A normal `burn()` should only burn the caller's own balance, so that no third party can touch a user's tokens. For redemption, the Vault should use a dedicated burn path that only burns sUSD already transferred into the Vault, rather than naming an arbitrary user. Or use `burnFrom()`, which requires the user to approve the Vault first.
 <br><br><br>
 
 **A2.** In this contract `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` all go to the same address. How would you split them in production, and who holds each?
 
 > Your answer:
-I will separate these roles based on their responsibilities. `DEFAULT_ADMIN_ROLE` should be given to an admin account with a time delay, and it should only manage roles and important settings. `MINTER_ROLE` should be given to Vault contract, which can only mint tokens according to the collateral rules. `PAUSER_ROLE` should be given to a separate emergency account, which can pause the system but cannot mint tokens or change roles. With these three powers separated, even if one account is compromised, the attacker cannot control all three functions at once.
+I will separate these roles based on their responsibilities. `DEFAULT_ADMIN_ROLE` should be held an admin account with a high signing threshold and a time delay. It should only manage role assignments and critical governance settings, and should not perform routine minting or emergency actions. `MINTER_ROLE` should be given to the audited Vault or a dedicated minting contract, which can mint only according to the collateral and accounting rules, and should not have governance authority. `PAUSER_ROLE` should be given to a separate emergency-security account or multisig, which needs to pause the system quickly during an exploit but cannot mint tokens or change role assignments.
 <br><br><br>
 
 ---
@@ -25,7 +26,7 @@ I will separate these roles based on their responsibilities. `DEFAULT_ADMIN_ROLE
 **B1.** `_update` is the single entry point for every balance change, so `pause()` freezes transfers, minting and redemption together. If you wanted "pause transfers but **allow redemption**", how would you change it? Give the approach — full code not required.
 
 > Your answer:
-Separate transfer pausing from redemption pausing instead of stopping all balance changes. Use two separate flags to paused transfers and to pausedRedemption, normal transfer only check the first one, while redemption only checks the second one. 
+I would decouple transfer pausing from redemption pausing instead of applying one condition to every balance change. The simplest approach is two independent flags, to paused transfers and to paused Redemption. Normal ERC-20 `transfer` and `transferFrom` would check only `pausedTransfers`, while the redemption function checks only `pausedRedemption`. That way the protocol can stop normal transfers during an incident while keeping the redemption channel open. Another approach is to give redemption its own burn entry point that bypasses the transfer pause and only burns sUSD already held by the Vault. 
 <br><br><br>
 
 **B2.** In 2008, when a money-market fund "broke the buck", redemptions were frozen for days. In 2023 USDC depegged to $0.87 after a reserve bank failed, but redemptions were **not** shut. Compare the two responses — what does closing the redemption channel, or leaving it open, do to a stablecoin?
