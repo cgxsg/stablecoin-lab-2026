@@ -8,7 +8,10 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IERC3156FlashBorrower, IERC3156FlashLender} from "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
+import {
+    IERC3156FlashBorrower,
+    IERC3156FlashLender
+} from "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
 
 /// @title Unstoppable Vault
 /// @notice Ported from the "Unstoppable" challenge in Damn Vulnerable DeFi v4
@@ -67,10 +70,12 @@ contract UnstoppableVault is ERC4626, Ownable, Pausable, ReentrancyGuard, IERC31
     }
 
     /// @inheritdoc IERC3156FlashLender
-    function flashLoan(IERC3156FlashBorrower receiver, address _token, uint256 amount, bytes calldata data)
-        external
-        returns (bool)
-    {
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address _token,
+        uint256 amount,
+        bytes calldata data
+    ) external returns (bool) {
         if (amount == 0) revert InvalidAmount(0);
         if (asset() != _token) revert UnsupportedCurrency();
 
@@ -106,11 +111,13 @@ contract UnstoppableVault is ERC4626, Ownable, Pausable, ReentrancyGuard, IERC31
         super._deposit(caller, receiver, assets, shares);
     }
 
-    function _withdraw(address caller, address receiver, address owner_, uint256 assets, uint256 shares)
-        internal
-        override
-        nonReentrant
-    {
+    function _withdraw(
+        address caller,
+        address receiver,
+        address owner_,
+        uint256 assets,
+        uint256 shares
+    ) internal override nonReentrant {
         super._withdraw(caller, receiver, owner_, assets, shares);
     }
 

@@ -38,8 +38,12 @@ contract StablecoinTest is Test {
         vm.stopPrank();
 
         assertEq(stable.balanceOf(alice), AMOUNT, "should mint 1:1");
-        assertEq(usdc.balanceOf(address(vault)), AMOUNT, "collateral should be escrowed in the vault");
-        assertEq(vault.totalCollateral(), stable.totalSupply(), "collateral should fully back the supply");
+        assertEq(
+            usdc.balanceOf(address(vault)), AMOUNT, "collateral should be escrowed in the vault"
+        );
+        assertEq(
+            vault.totalCollateral(), stable.totalSupply(), "collateral should fully back the supply"
+        );
     }
 
     function test_Redeem_BurnsAndReturnsCollateral() public {
@@ -100,7 +104,9 @@ contract StablecoinTest is Test {
         vault.deposit(amount);
         vm.stopPrank();
 
-        assertGe(vault.totalCollateral(), stable.totalSupply(), "collateral does not cover the supply");
+        assertGe(
+            vault.totalCollateral(), stable.totalSupply(), "collateral does not cover the supply"
+        );
     }
 
     // ---------- edge cases ----------

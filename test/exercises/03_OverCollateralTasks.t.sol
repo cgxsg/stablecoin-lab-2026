@@ -58,11 +58,7 @@ contract OverCollateralTasksTest is Test {
 
         assertEq(vault.collateralValue(1e18), 2000e6, "1 mWETH @ 2000 = 2000 sUSD");
         assertEq(vault.collateralValueOf(alice), 2000e6);
-        assertEq(
-            vault.collateralRatio(alice),
-            type(uint256).max,
-            "with no debt the ratio is max"
-        );
+        assertEq(vault.collateralRatio(alice), type(uint256).max, "with no debt the ratio is max");
     }
 
     // ==================================================================
