@@ -268,3 +268,23 @@ These have no standard answers. They are the real point of this lab:
    `totalCollateral()` invariant?
 
 Question 4 is the door into next week's RWA lab.
+
+## 8. Submission artifacts
+
+### Architecture
+
+![Core architecture](architecture.png)
+
+### Ex3: broken peg
+
+`totalSupply()` is `1000000000000` (1e12). `totalCollateral()` is `0`.
+
+![Ex3: totalSupply is 1e12 while totalCollateral is 0](ex3.png)
+
+### Sepolia contracts
+
+| Contract | Address | Etherscan |
+|---|---|---|
+| MockUSDC | `0x925DaCcE6aE67405147042099d36405e78227888` | <https://sepolia.etherscan.io/address/0x925DaCcE6aE67405147042099d36405e78227888> |
+| SimpleStablecoin | `0x8c03E521b1e06c1CCF0BE8c41b5F19d49d67D4f8` | <https://sepolia.etherscan.io/address/0x8c03E521b1e06c1CCF0BE8c41b5F19d49d67D4f8> |
+| Vault | `0x2CfaEF08aa256Db8135A4B048da2a04C50cc372d` | <https://sepolia.etherscan.io/address/0x2CfaEF08aa256Db8135A4B048da2a04C50cc372d> |
